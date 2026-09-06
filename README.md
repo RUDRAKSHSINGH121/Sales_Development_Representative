@@ -32,7 +32,7 @@ Developed as the technical deliverable for the **AI SDR Intern Technical Assessm
 - [x] **Setup Instructions**: Dedicated standalone guide in [`SETUP.md`](SETUP.md) and detailed in [Setup & Running Locally](#setup--running-locally).
 - [x] **Screenshots**: High-resolution screen captures in `screenshots/` covering all key workflows.
 - [x] **Word Documentation (.docx)**: Complete visual walkthrough and technical evaluation report in [`LeadPilot_Technical_Assessment_Report.docx`](LeadPilot_Technical_Assessment_Report.docx).
-- [x] **GitHub Repository**: Initialized Git repository with clean commit history.
+- [x] **GitHub Repository**: [`RUDRAKSHSINGH121/Sales_Development_Representative`](https://github.com/RUDRAKSHSINGH121/Sales_Development_Representative).
 
 ---
 
