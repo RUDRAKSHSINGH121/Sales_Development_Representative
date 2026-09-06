@@ -1,0 +1,40 @@
+databases:
+  - name: leadpilot-db
+    databaseName: leadpilot
+    user: leadpilot
+    plan: free
+
+services:
+  - type: web
+    name: leadpilot-backend
+    env: python
+    rootDir: backend
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python -m scripts.seed && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: leadpilot-db
+          property: connectionString
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_BASE_URL
+        value: "https://aicredits.in/v1"
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        value: "*"
+
+  - type: web
+    name: leadpilot-frontend
+    env: node
+    rootDir: frontend
+    plan: free
+    buildCommand: "npm install && npm run build"
+    startCommand: "npm start"
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        sync: false
