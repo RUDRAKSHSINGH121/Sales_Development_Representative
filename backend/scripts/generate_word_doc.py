@@ -54,10 +54,11 @@ def create_document():
     sub_run.font.color.rgb = RGBColor(37, 99, 235) # #2563EB
 
     # Meta Callout Table
-    meta_table = doc.add_table(rows=4, cols=2)
+    meta_table = doc.add_table(rows=5, cols=2)
     meta_table.alignment = WD_TABLE_ALIGNMENT.CENTER
     meta_data = [
         ("Candidate / Author:", "Rudraksh Singh (Technical Assessment Submission)"),
+        ("Live Cloud URL (Railway):", "Web App: https://leadpilot-frontend-production-fdd7.up.railway.app\nAPI Docs: https://leadpilot-backend-production-ead0.up.railway.app/docs"),
         ("Project:", "LeadPilot Mini AI SDR (Sales Development Representative)"),
         ("Technology Stack:", "React/Next.js 15, FastAPI, PostgreSQL 16+, OpenAI API (gpt-4o-mini), Google Gemini API (gemini-3.6-flash), JWT Authentication"),
         ("Demo Account Credentials:", "Email: demo@leadpilot.dev  |  Password: LeadPilot123!"),
