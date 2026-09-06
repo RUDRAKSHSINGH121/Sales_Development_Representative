@@ -4,10 +4,13 @@ LeadPilot is a high-performance, AI-assisted Sales Development Representative (S
 
 Developed as the technical deliverable for the **AI SDR Intern Technical Assessment**.
 
-> [!TIP]
-> **Demo Account for Immediate Use**:
-> - **Username / Email**: `demo@leadpilot.dev`
-> - **Password**: `LeadPilot123!`
+> [!IMPORTANT]
+> **🚀 Live Cloud Deployment (Railway)**:
+> - **Live Web Application**: [https://leadpilot-frontend-production-fdd7.up.railway.app](https://leadpilot-frontend-production-fdd7.up.railway.app)
+> - **Interactive Swagger API**: [https://leadpilot-backend-production-ead0.up.railway.app/docs](https://leadpilot-backend-production-ead0.up.railway.app/docs)
+> - **Pre-configured Demo Account**:
+>   - **Email**: `demo@leadpilot.dev`
+>   - **Password**: `LeadPilot123!`
 
 ---
 
