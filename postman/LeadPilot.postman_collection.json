@@ -1,0 +1,401 @@
+{
+  "info": {
+    "name": "LeadPilot API - Mini AI SDR Platform",
+    "_postman_id": "a9b8c7d6-e5f4-4321-ba98-123456789abc",
+    "description": "Comprehensive Postman API Collection for the LeadPilot Mini AI SDR application.\n\nKey Highlights:\n- User Authentication (JWT Login & Registration)\n- Lead CRUD, Search, and Filtering\n- OpenAI-based Lead Qualification (Objective 4)\n- Gemini-based Personalized Email Outreach (Objective 5)\n- PostgreSQL Data Storage & Dashboard Analytics",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "lead_id",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rudraksh Singh\",\n  \"email\": \"rudraksh@leadpilot.dev\",\n  \"password\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Register a new SDR user account."
+          }
+        },
+        {
+          "name": "Login (Auto-sets Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access_token) {",
+                  "    pm.collectionVariables.set('token', jsonData.access_token);",
+                  "    console.log('JWT Token successfully set in collection variables');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"demo@leadpilot.dev\",\n  \"password\": \"LeadPilot123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Authenticates user and returns JWT bearer token. Sets {{token}} variable automatically."
+          }
+        },
+        {
+          "name": "Get Current User Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Fetches profile information for the authenticated token."
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Lead Management",
+      "item": [
+        {
+          "name": "List All Leads",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/leads?page=1&page_size=10",
+              "host": ["{{base_url}}"],
+              "path": ["leads"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Lists paginated prospects owned by the authenticated user."
+          }
+        },
+        {
+          "name": "Search Leads",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/leads?search=Acme",
+              "host": ["{{base_url}}"],
+              "path": ["leads"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "Acme"
+                }
+              ]
+            },
+            "description": "Search leads across name, company, or email."
+          }
+        },
+        {
+          "name": "Filter Leads by Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/leads?status=qualified",
+              "host": ["{{base_url}}"],
+              "path": ["leads"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "qualified"
+                }
+              ]
+            },
+            "description": "Filter leads by AI qualification status (qualified, review, unqualified)."
+          }
+        },
+        {
+          "name": "Create Lead",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set('lead_id', jsonData.id.toString());",
+                  "    console.log('lead_id updated to ' + jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Rachel\",\n  \"last_name\": \"Zane\",\n  \"email\": \"rachel.zane@lawcorp.test\",\n  \"company\": \"Pearson Legal\",\n  \"job_title\": \"Managing Partner\",\n  \"industry\": \"Professional Services\",\n  \"company_size\": \"51 - 200\",\n  \"website\": \"https://pearsonlegal.test\",\n  \"location\": \"New York, USA\",\n  \"notes\": \"Interested in contract automation tools.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/leads",
+              "host": ["{{base_url}}"],
+              "path": ["leads"]
+            },
+            "description": "Create a new prospect record and sets {{lead_id}}."
+          }
+        },
+        {
+          "name": "Get Lead by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/leads/{{lead_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["leads", "{{lead_id}}"]
+            },
+            "description": "Retrieve lead details including latest qualification analysis."
+          }
+        },
+        {
+          "name": "Update Lead",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Rachel\",\n  \"last_name\": \"Zane\",\n  \"email\": \"rachel.zane@lawcorp.test\",\n  \"company\": \"Pearson Specter Legal\",\n  \"job_title\": \"Senior Managing Partner\",\n  \"industry\": \"Professional Services\",\n  \"company_size\": \"201 - 500\",\n  \"website\": \"https://pearsonspecter.test\",\n  \"location\": \"New York, USA\",\n  \"notes\": \"High-value account evaluated for firm-wide deployment.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/leads/{{lead_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["leads", "{{lead_id}}"]
+            },
+            "description": "Update prospect information."
+          }
+        },
+        {
+          "name": "Delete Lead",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/leads/{{lead_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["leads", "{{lead_id}}"]
+            },
+            "description": "Deletes a lead and its associated qualification and outreach data."
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. AI Integrations (OpenAI & Gemini)",
+      "item": [
+        {
+          "name": "Qualify Lead (OpenAI)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/leads/{{lead_id}}/qualify",
+              "host": ["{{base_url}}"],
+              "path": ["leads", "{{lead_id}}", "qualify"]
+            },
+            "description": "Objective 4: Evaluates lead using OpenAI GPT-4o mini and returns structured score (0-100), status, reasoning, and key signals."
+          }
+        },
+        {
+          "name": "Generate Outreach Email (Gemini)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"purpose\": \"Introduction / Outreach\",\n  \"tone\": \"Professional\",\n  \"context\": \"Highlight automated SDR qualification and request a 15-minute introductory call.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/leads/{{lead_id}}/generate-email",
+              "host": ["{{base_url}}"],
+              "path": ["leads", "{{lead_id}}", "generate-email"]
+            },
+            "description": "Objective 5: Uses Google Gemini to generate a tailored B2B outreach email draft based on lead facts."
+          }
+        },
+        {
+          "name": "Get Lead Generated Emails",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/leads/{{lead_id}}/emails",
+              "host": ["{{base_url}}"],
+              "path": ["leads", "{{lead_id}}", "emails"]
+            },
+            "description": "Retrieve outreach emails generated for a specific lead."
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Analytics & Outreach History",
+      "item": [
+        {
+          "name": "Get Dashboard Metrics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/dashboard",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard"]
+            },
+            "description": "Aggregates pipeline stats: total leads, qualified count, emails generated, avg AI score, and recent prospects."
+          }
+        },
+        {
+          "name": "List All Generated Emails",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/emails",
+              "host": ["{{base_url}}"],
+              "path": ["emails"]
+            },
+            "description": "Lists all outreach emails generated across the user workspace."
+          }
+        }
+      ]
+    }
+  ]
+}

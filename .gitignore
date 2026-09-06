@@ -1,0 +1,36 @@
+# Environment and Secret Files
+.env
+.env.*
+*.env
+*.env.*
+!.env.example
+!.env.docker.example
+!frontend/.env.example
+!backend/.env.example
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+venv/
+.pytest_cache/
+*.db
+*.sqlite3
+
+# Node / Next.js
+node_modules/
+.pnpm-store/
+.next/
+out/
+build/
+dist/
+coverage/
+
+# IDE / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

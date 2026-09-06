@@ -1,0 +1,69 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: leadpilot-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-leadpilot}
+      POSTGRES_USER: ${POSTGRES_USER:-leadpilot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-leadpilot}
+    ports:
+      - "${POSTGRES_HOST_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-leadpilot} -d ${POSTGRES_DB:-leadpilot}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - leadpilot-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: leadpilot-backend:latest
+    container_name: leadpilot-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-leadpilot}:${POSTGRES_PASSWORD:-leadpilot}@db:5432/${POSTGRES_DB:-leadpilot}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-LtW7VPSTrEfUXKrpzD7SNapZpIcHNWcWMGxHbwu0jJXtgW5LuTJyEbpgfO3cKyDT}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-sk-live-7a4bface4e0652c2d47fe34f431ce7f7ddff598486d3236db57542d8f280b715}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://aicredits.in/v1}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-AQ.Ab8RN6KtFGlECKUmuEjJMxC5Uh8Wl-RrMjXKDuNyDxVq-FyHOQ}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    networks:
+      - leadpilot-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    image: leadpilot-frontend:latest
+    container_name: leadpilot-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      PORT: 3000
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    networks:
+      - leadpilot-net
+
+volumes:
+  postgres_data:
+    name: leadpilot_postgres_data
+
+networks:
+  leadpilot-net:
+    name: leadpilot_network
