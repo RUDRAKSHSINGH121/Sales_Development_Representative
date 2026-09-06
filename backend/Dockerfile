@@ -18,7 +18,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy backend application code
 COPY app/ ./app/
 COPY scripts/ ./scripts/
+COPY start.sh ./start.sh
+RUN chmod +x ./start.sh
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "python -m scripts.seed && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "start.sh"]
