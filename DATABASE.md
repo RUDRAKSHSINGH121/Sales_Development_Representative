@@ -2,7 +2,7 @@
 
 This document provides a comprehensive overview of the **PostgreSQL relational database schema**, entity relationships, performance indexes, and execution instructions for the **LeadPilot Mini AI SDR** platform.
 
-This document directly satisfies the **"Database Scripts"** mandatory deliverable required by the **AI SDR Intern Technical Assessment**.
+
 
 ---
 
